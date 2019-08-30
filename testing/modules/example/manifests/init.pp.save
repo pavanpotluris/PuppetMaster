@@ -1,0 +1,45 @@
+class example {
+	$port = '8090'
+	
+	notify {"This is local variable:::::: $port":}
+	
+	#ensure - present, absent, file, directory, link
+	
+	file { 'a.txt':
+		path => '/home/ubuntu/test/a.txt',
+		ensure => file,
+		content => template('/etc/puppet/environments/production/modules/example/files/server.xml'),
+		owner => 'ubuntu',
+		mode => '0644'	
+	}
+
+	#Copying only single file
+	file { 'A':
+                path => "/home/ubuntu/test/A/c.txt",
+                ensure => present,
+                source => "puppet:///module_files/example/files/B/C/c.txt",
+		recurse => true,
+                owner => 'ubuntu',
+		group => 'ubuntu',
+		mode => '0644'
+        }
+	
+	#Copying Entire Directory
+        file {
+                'B':
+                ensure => 'directory',
+                source => 'puppet:///module_files/example/files/B',
+                recurse => 'remote',
+                path => '/home/ubuntu/test/A',
+                owner => 'ubuntu',
+                group => 'ubuntu',
+                mode  => '0744', # Use 0700 if it is sensitive
+        }
+
+	#TIDY directory TEMP
+	tidy { '/tmp':
+  age     => '1w',
+  recurse => 1,
+  matches => [ '[0-9]pub*.tmp', '*.temp', 'tmpfile?' ],
+}
+}
